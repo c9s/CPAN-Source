@@ -40,7 +40,6 @@ has source_mirror =>
     default => sub { 'http://cpansearch.perl.org/' };
 
 
-
 # data accessors
 has authors => 
     is => 'rw',
@@ -162,12 +161,14 @@ sub prepare_package_data {
 
         my $tar_path = $self->mirror . '/authors/id/' . $path;
         my $d = CPAN::DistnameInfo->new( $tar_path );
-        my $distinfo = { 
-            $d->properties,
-            source_mirror => $self->module_source_path($d),
-        };
 
-        $self->dists->{ $d->dist } = $distinfo unless $self->dists->{ $d->dist };
+        if( $d->version ) {
+            my $distinfo = { 
+                $d->properties,
+                source_mirror => $self->module_source_path($d),
+            };
+            $self->dists->{ $d->dist } = $distinfo unless $self->dists->{ $d->dist };
+        }
 
         # Moose::Foo => {  ..... }
         $packages->{ $class } = { 
@@ -266,15 +267,55 @@ CPAN::Source - Fetch cpan source data and manipulate
 
 =head1 DESCRIPTION
 
+L<CPAN::Source> fetch, parse, integrate CPAN source list for you.
+
+Currently CPAN::Source supports 4 files from CPAN mirror. (00whois.xml,
+contains cpan author information, 01mailrc.txt contains author emails, 
+02packages.details.txt contains package information, 03modlist contains distribution status)
+
+L<CPAN::Source> aggregate those data, and information can be easily retrieved.
+
+The distribution info is from L<CPAN::DistnameInfo>.
+
 =head1 SYNOPSIS
 
-    my $source = CPAN::Source->new(  mirror => 'http://cpan.nctu.edu.tw' );
-    $source->prepare;   # use LWP::UserAgent to fetch source list files ...
+    my $source = CPAN::Source->new(  
+        cache_path => '.cache',
+        cache_expiry => '7 days',
+        mirror => 'http://cpan.nctu.edu.tw',
+        source_mirror => 'http://cpansearch.perl.org'
+    );
+
+    $source->prepare;   # use LWP::UserAgent to fetch all source list files ...
 
     # 00whois.xml
     # 01mailrc
     # 02packages.details.txt
     # 03modlist
+
+    $source->dists;  # all dist information
+    $source->authors;  # all author information
+
+    $source->package_data;  # parsed package data from 02packages.details.txt.gz
+    $source->modlist;       # parsed package data from 03modlist.data.gz
+    $source->mailrc;        # parsed mailrc data  from 01mailrc.txt.gz
+
+=head1 FUNCTIONS
+
+=head2 new( OPTIONS )
+
+
+
+
+
+=head2 prepare_authors 
+
+=head2 prepare_mailrc
+
+=head2 prepare_modlist
+
+=head2 prepare_package_data
+
 
 =head1 AUTHOR
 
