@@ -22,11 +22,13 @@ META.yml
 README.mkdn
 t/00-load.t
 t/00_compile.t
+t/01-fetch-pm.t
 t/01-prepare-author.t
 t/01-prepare-mailrc.t
 t/01-prepare-modlist.t
 t/01-prepare-pkg.t
 t/01-prepare-recent.t
+t/01-prepare-stamp.t
 t/02-dist.t
 xt/01_podspell.t
 xt/02_perlcritic.t

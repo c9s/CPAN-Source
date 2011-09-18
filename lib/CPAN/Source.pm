@@ -307,6 +307,13 @@ sub module_source_path {
     return ( $self->source_mirror . '/src/' . $d->cpanid . '/' . $d->distvname );
 }
 
+
+sub author {
+    my ($self,$pause_id) = @_;
+    return $self->authors->{ $pause_id };
+}
+
+# return package obj
 sub package {
     my ($self,$pkgname) = @_;
     return $self->package_data->{packages}->{ $pkgname };
@@ -428,9 +435,17 @@ The distribution info is from L<CPAN::DistnameInfo>.
 
 =for 4
 
+=item authors
+
+Which is a hashref, contains:
+
+    {
+        {pauseId} => { ... }
+    }
+
 =item package_data
 
-which is a hashref, contains:
+Which is a hashref, contains:
 
     { 
         meta => { 

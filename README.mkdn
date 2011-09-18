@@ -64,9 +64,17 @@ The distribution info is from [CPAN::DistnameInfo](http://search.cpan.org/perldo
 
 # ACCESSORS
 
+- authors
+
+Which is a hashref, contains:
+
+    {
+        {pauseId} => { ... }
+    }
+
 - package_data
 
-which is a hashref, contains:
+Which is a hashref, contains:
 
     { 
         meta => { 

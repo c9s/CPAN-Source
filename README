@@ -59,8 +59,15 @@ SYNOPSIS
         my $mirror_server_timestamp = $source->stamp;  # DateTime object
 
 ACCESSORS
+    authors
+        Which is a hashref, contains:
+
+            {
+                {pauseId} => { ... }
+            }
+
     package_data
-        which is a hashref, contains:
+        Which is a hashref, contains:
 
             { 
                 meta => { 
@@ -136,6 +143,6 @@ POD ERRORS
     Hey! The above document had some coding errors, which are explained
     below:
 
-    Around line 431:
+    Around line 438:
         '=item' outside of any '=over'
 
