@@ -47,7 +47,10 @@ SYNOPSIS
         $meta_data->{resources}->{bugtracker};
         $meta_data->{resources}->{repository};
 
-FUNCTIONS
+        my $readme = $dist->fetch_readme;
+        my $changes = $dist->fetch_changes;
+
+METHODS
   new( OPTIONS )
   prepare_authors
   prepare_mailrc
@@ -88,6 +91,6 @@ POD ERRORS
     Hey! The above document had some coding errors, which are explained
     below:
 
-    Around line 385:
+    Around line 387:
         '=item' outside of any '=over'
 

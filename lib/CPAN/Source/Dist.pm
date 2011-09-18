@@ -46,14 +46,14 @@ sub fetch_readme {
 sub fetch_changes {
     my $self = shift;
     return $self->fetch_source_file( 'Changes' )
-        || $self->fetch_source_file( 'Changelog' );
-        || $self->fetch_source_file( 'CHANGELOG' );
+            || $self->fetch_source_file( 'Changelog' )
+            || $self->fetch_source_file( 'CHANGELOG' );
 }
 
 sub fetch_todo {
     my $self = shift;
     return $self->fetch_source_file( 'TODO' )
-      || $self->fetch_source_file( 'Todo' );
+        || $self->fetch_source_file( 'Todo' );
 }
 
 sub to_string { 

@@ -49,9 +49,10 @@ The distribution info is from [CPAN::DistnameInfo](http://search.cpan.org/perldo
     $meta_data->{resources}->{bugtracker};
     $meta_data->{resources}->{repository};
 
+    my $readme = $dist->fetch_readme;
+    my $changes = $dist->fetch_changes;
 
-
-# FUNCTIONS
+# METHODS
 
 ## new( OPTIONS )
 
