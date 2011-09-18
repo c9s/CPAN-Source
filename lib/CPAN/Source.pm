@@ -4,7 +4,7 @@ use strict;
 use feature qw(say);
 use Try::Tiny;
 use URI;
-use Moose;
+use Any::Moose;
 use Compress::Zlib;
 use LWP::UserAgent;
 use XML::Simple qw(XMLin);
@@ -13,6 +13,9 @@ use DateTime::Format::HTTP;
 use CPAN::DistnameInfo;
 use YAML::XS;
 use JSON::XS;
+
+use CPAN::Source::Dist;
+use CPAN::Source::Package;
 
 use constant { DEBUG => $ENV{DEBUG} };
 
@@ -171,6 +174,7 @@ sub prepare_package_data {
         printf("\r [%d/%d] " , ++$cnt , $size) if DEBUG;
 
         my $tar_path = $self->mirror . '/authors/id/' . $path;
+
         my $d = CPAN::DistnameInfo->new( $tar_path );
 
         if( $d->version ) {
@@ -182,12 +186,12 @@ sub prepare_package_data {
         }
 
         # Moose::Foo => {  ..... }
-        $packages->{ $class } = { 
+        $packages->{ $class } = CPAN::Source::Package->new( 
             class     => $class,
             version   => $version ,
             path      => $tar_path,
             dist      => $d->dist,
-        };
+        );
     }
 
     my $result = { 
@@ -272,6 +276,16 @@ sub http_get {
 
     $self->cache->set( $url , $resp->content , $cache_expiry ) if $self->cache;
     return $resp->content;
+}
+
+
+sub new_dist {
+    my ($self,$d) = @_;
+    my $dist = CPAN::Source::Dist->new( 
+        $d->properties,
+        source_mirror => $self->module_source_path($d),
+    );
+    return $dist;
 }
 
 sub new_ua {
