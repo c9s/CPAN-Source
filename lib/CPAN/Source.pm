@@ -389,6 +389,14 @@ Download 02packages.details.gz and parse it.
 
 Return full-qualified source path. built from source mirror, the default source mirror is L<http://cpansearch.perl.org>.
 
+=head2 mirrors 
+
+Return mirror info from mirror site. (07mirrors.json)
+
+=head2 dist( $name )
+
+return L<CPAN::Source::Dist> object.
+
 =head2 http_get
 
 Use L<LWP::UserAgent> to fetch content.
