@@ -71,8 +71,10 @@ has mailrc =>
 has mirrors =>
     is => 'rw',
     isa => 'HashRef',
+    lazy => 1,
     default => sub { 
         my $self = shift;
+        return unless $self->mirror;
         # get 07mirror.json
         my $json = $self->http_get( $self->mirror . '/modules/07mirror.json' );
         my $data = decode_json( $json );
@@ -291,7 +293,8 @@ sub new_dist {
     my ($self,$d) = @_;
     my $dist = CPAN::Source::Dist->new( 
         $d->properties,
-        source_mirror => $self->module_source_path($d),
+        source_path => $self->module_source_path($d),
+        _parent => $self,
     );
     return $dist;
 }
