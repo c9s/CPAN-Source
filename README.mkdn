@@ -1,0 +1,71 @@
+# NAME
+
+CPAN::Source - Fetch cpan source data and manipulate
+
+# DESCRIPTION
+
+[CPAN::Source](http://search.cpan.org/perldoc?CPAN::Source) fetch, parse, integrate CPAN source list for you.
+
+Currently CPAN::Source supports 4 files from CPAN mirror. (00whois.xml,
+contains cpan author information, 01mailrc.txt contains author emails, 
+02packages.details.txt contains package information, 03modlist contains distribution status)
+
+[CPAN::Source](http://search.cpan.org/perldoc?CPAN::Source) aggregate those data, and information can be easily retrieved.
+
+The distribution info is from [CPAN::DistnameInfo](http://search.cpan.org/perldoc?CPAN::DistnameInfo).
+
+# SYNOPSIS
+
+    my $source = CPAN::Source->new(  
+        cache_path => '.cache',
+        cache_expiry => '7 days',
+        mirror => 'http://cpan.nctu.edu.tw',
+        source_mirror => 'http://cpansearch.perl.org'
+    );
+
+    $source->prepare;   # use LWP::UserAgent to fetch all source list files ...
+
+    # 00whois.xml
+    # 01mailrc
+    # 02packages.details.txt
+    # 03modlist
+
+    $source->dists;  # all dist information
+    $source->authors;  # all author information
+
+    $source->package_data;  # parsed package data from 02packages.details.txt.gz
+    $source->modlist;       # parsed package data from 03modlist.data.gz
+    $source->mailrc;        # parsed mailrc data  from 01mailrc.txt.gz
+
+# FUNCTIONS
+
+## new( OPTIONS )
+
+
+
+
+
+
+
+
+
+## prepare_authors 
+
+## prepare_mailrc
+
+## prepare_modlist
+
+## prepare_package_data
+
+
+
+# AUTHOR
+
+Yo-An Lin <cornelius.howl {at} gmail.com>
+
+# SEE ALSO
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
