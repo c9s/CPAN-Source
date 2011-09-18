@@ -15,6 +15,7 @@ use CPAN::DistnameInfo;
 
 use constant { DEBUG => $ENV{DEBUG} };
 
+our $VERSION = '0.01';
 
 has cache_path => 
     is => 'rw',
@@ -40,6 +41,11 @@ has source_mirror =>
 has authors => 
     is => 'rw',
     isa => 'HashRef';
+
+has dists =>
+    is => 'rw',
+    isa => 'HashRef',
+    default => sub {  +{  } };
 
 has package_data =>
     is => 'rw',
@@ -150,20 +156,19 @@ sub prepare_package_data {
 
         my $tar_path = $self->mirror . '/authors/id/' . $path;
         my $d = CPAN::DistnameInfo->new( $tar_path );
+        my $distinfo = { 
+            $d->properties,
+            source_mirror => $self->module_source_path($d),
+        };
+
+        $self->dists->{ $d->dist } = $distinfo unless $self->dists->{ $d->dist };
 
         # Moose::Foo => {  ..... }
         $packages->{ $class } = { 
             class     => $class,
             version   => $version ,
             path      => $tar_path,
-
-            pauseid   => $d->cpanid,
             dist      => $d->dist,
-            distvname => $d->distvname,
-            filename  => $d->filename,
-            maturity  => $d->maturity,  # "released"
-
-            source_mirror => $self->module_source_path($d),
         };
     }
 
@@ -211,11 +216,10 @@ sub parse_mailrc {
     return \%result;
 }
 
-
 sub module_source_path {
     my ($self,$d) = ($_[0], $_[1]);
     return undef unless $d->distvname;
-    return ( $self->source_mirror . '/' . $d->cpanid . '/' . $d->distvname );
+    return ( $self->source_mirror . '/src/' . $d->cpanid . '/' . $d->distvname );
 }
 
 sub http_get { 
