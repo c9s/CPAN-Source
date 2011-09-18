@@ -51,25 +51,12 @@ SYNOPSIS
         my $readme = $dist->fetch_readme;
         my $changes = $dist->fetch_changes;
 
-METHODS
-  new( OPTIONS )
-  prepare_authors
-  prepare_mailrc
-  prepare_modlist
-    Download 03modlist.data.gz and parse it.
 
-  prepare_package_data
-    Download 02packages.details.gz and parse it.
+        my $pkg = $source->package( 'Moose' );
+        my $pm_content = $pkg->fetch_pm();
 
-  module_source_path
-    Return full-qualified source path. built from source mirror, the default
-    source mirror is <http://cpansearch.perl.org>.
 
-  http_get
-    Use LWP::UserAgent to fetch content.
-
-  new_dist
-    Convert CPAN::DistnameInfo into CPAN::Source::Dist.
+        my $mirror_server_timestamp = $source->stamp;  # DateTime object
 
 ACCESSORS
     package_data
@@ -94,6 +81,49 @@ ACCESSORS
                 }
             }
 
+METHODS
+  new( OPTIONS )
+  prepare_authors
+  prepare_mailrc
+  prepare_modlist
+    Download 03modlist.data.gz and parse it.
+
+  prepare_package_data
+    Download 02packages.details.gz and parse it.
+
+  module_source_path
+    Return full-qualified source path. built from source mirror, the default
+    source mirror is <http://cpansearch.perl.org>.
+
+  mirrors
+    Return mirror info from mirror site. (07mirrors.json)
+
+  fetch_whois
+  fetch_mailrc
+  fetch_package_data
+  fetch_modlist_data
+  fetch_mirrors
+  fetch_module_rss
+    Return modules rss, from {Mirror}/modules/01modules.mtime.rss
+
+  fetch_recent( $period )
+    Fetch recent updated modules,
+
+        my $list = $source->fetch_recent( '1d' );
+        my $list = $source->fetch_recent( '1M' );
+
+  dist( $name )
+    return CPAN::Source::Dist object.
+
+  http_get
+    Use LWP::UserAgent to fetch content.
+
+  new_dist
+    Convert CPAN::DistnameInfo into CPAN::Source::Dist.
+
+  purge_cache
+    Purge cache.
+
 AUTHOR
     Yo-An Lin <cornelius.howl {at} gmail.com>
 
@@ -106,6 +136,6 @@ POD ERRORS
     Hey! The above document had some coding errors, which are explained
     below:
 
-    Around line 404:
+    Around line 431:
         '=item' outside of any '=over'
 

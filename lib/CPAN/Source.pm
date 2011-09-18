@@ -87,7 +87,7 @@ has mirrors =>
         my $self = shift;
         return unless $self->mirror;
         # get 07mirror.json
-        my $json = $self->http_get( $self->mirror . '/modules/07mirror.json' );
+        my $json = $self->fetch_mirrors;
         my $data = decode_json( $json );
         return $data;
     };
@@ -259,6 +259,11 @@ sub parse_mailrc {
 sub purge_cache {
     my $self = shift;
     $self->cache->purge;
+}
+
+sub fetch_mirrors {
+    my $self = shift;
+    return $self->http_get( $self->mirror . '/modules/07mirror.json' );
 }
 
 sub fetch_mailrc {
@@ -472,6 +477,16 @@ Return full-qualified source path. built from source mirror, the default source 
 =head2 mirrors 
 
 Return mirror info from mirror site. (07mirrors.json)
+
+=head2 fetch_whois
+
+=head2 fetch_mailrc
+
+=head2 fetch_package_data
+
+=head2 fetch_modlist_data
+
+=head2 fetch_mirrors
 
 =head2 fetch_module_rss
 
