@@ -18,7 +18,6 @@ has cpanid => is => 'rw';
 has extension => is => 'rw';
 has pathname => is => 'rw';
 has source_path => is => 'rw';
-
 has _parent => is => 'rw', isa => 'CPAN::Source';
 
 sub BUILD {
@@ -64,12 +63,11 @@ sub fetch_todo {
         || $self->fetch_source_file( 'Todo' );
 }
 
-sub fetch_tarball { 
-
-
+sub fetch_tarball {
+    # TODO:
 }
 
-sub to_string { 
+sub data { 
     my $self = shift;
     my @attrs = $self->meta->get_all_attributes;
     my $data = {  };
@@ -77,6 +75,12 @@ sub to_string {
         next if $attr->name =~ /^_/; # skip private attribute
         $data->{ $attr->name } = $attr->get_value( $self );
     }
+    return $data;
+}
+
+sub to_string { 
+    my $self = shift;
+    my $data = $self->data();
     return encode_json( $data );
 }
 

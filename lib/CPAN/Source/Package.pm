@@ -28,4 +28,15 @@ sub fetch_pm {
     return $self->dist->fetch_source_file( $path );
 }
 
+sub data { 
+    my $self = shift;
+    my @attrs = $self->meta->get_all_attributes;
+    my $data = {  };
+    for my $attr ( @attrs ) {
+        next if $attr->name =~ /^_/; # skip private attribute
+        $data->{ $attr->name } = $attr->get_value( $self );
+    }
+    return $data;
+}
+
 1;

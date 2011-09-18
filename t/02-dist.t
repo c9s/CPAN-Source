@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-use Test::More no_plan => 1;
+use Test::More 'no_plan';
 use CPAN::Source;
 use CPAN::Source::Dist;
 
@@ -22,5 +22,3 @@ my $meta;
 ok( $meta = $dist->fetch_meta );
 ok( $meta->{version} );
 ok( $meta->{abstract} );
-
-;

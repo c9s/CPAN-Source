@@ -9,6 +9,7 @@ use Compress::Zlib;
 use LWP::UserAgent;
 use XML::Simple qw(XMLin);
 use Cache::File;
+use DateTime;
 use DateTime::Format::HTTP;
 use CPAN::DistnameInfo;
 use YAML::XS;
@@ -68,6 +69,16 @@ has mailrc =>
     is => 'rw',
     isa => 'HashRef';
 
+has stamp => 
+    is => 'rw',
+    lazy => 1,
+    default => sub { 
+        my $self = shift;
+        my $content = $self->http_get( '/modules/02STAMP' );
+        my ( $ts , $date ) = split /\s/,$content;
+        return DateTime->from_epoch( epoch => $ts );
+    };
+
 has mirrors =>
     is => 'rw',
     isa => 'HashRef',
@@ -80,7 +91,6 @@ has mirrors =>
         my $data = decode_json( $json );
         return $data;
     };
-
 
 sub debug { 
     say "[DEBUG] " ,@_ if DEBUG;
