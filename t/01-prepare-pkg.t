@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use lib 'lib';
-use Test::More tests => 3;
-use_ok( 'CPAN::Source' );
+use CPAN::Source;
+use Test::More tests => 2;
 
 my $source = CPAN::Source->new( 
     mirror => 'http://cpan.nctu.edu.tw',

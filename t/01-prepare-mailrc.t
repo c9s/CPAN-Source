@@ -10,6 +10,3 @@ my $source = CPAN::Source->new(
 
 ok( $source );
 ok( $source->prepare_mailrc );
-
-# ok( $pkg_data = $source->prepare_package_data );
-# ok( $source->prepare_modlist );

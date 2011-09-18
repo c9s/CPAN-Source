@@ -10,8 +10,9 @@ use LWP::UserAgent;
 use XML::Simple qw(XMLin);
 use Cache::File;
 use DateTime::Format::HTTP;
-use YAML;
 use CPAN::DistnameInfo;
+use YAML::XS;
+use JSON::XS;
 
 use constant { DEBUG => $ENV{DEBUG} };
 
@@ -64,6 +65,18 @@ has mailrc =>
     is => 'rw',
     isa => 'HashRef';
 
+has mirrors =>
+    is => 'rw',
+    isa => 'HashRef',
+    default => sub { 
+        my $self = shift;
+        # get 07mirror.json
+        my $json = $self->http_get( $self->mirror . '/modules/07mirror.json' );
+        my $data = decode_json( $json );
+        return $data;
+    };
+
+
 sub debug { 
     say "[DEBUG] " ,@_ if DEBUG;
 }
@@ -95,7 +108,7 @@ sub prepare_authors {
 
     my $xml = $self->http_get( $self->mirror . '/authors/00whois.xml');
 
-    debug "Building authors data...";
+    debug "Parsing authors data...";
 
     my $authors = XMLin( $xml )->{cpanid};
     $self->authors( $authors );
@@ -104,9 +117,7 @@ sub prepare_authors {
 
 sub prepare_mailrc {
     my $self = shift;
-
     debug "Prepare mailrc data...";
-
     my $mailrc_txt = _decode_gzip( $self->http_get( $self->mirror . '/authors/01mailrc.txt.gz') );
     $self->mailrc( $self->parse_mailrc( $mailrc_txt ) );
 }
@@ -197,6 +208,22 @@ sub prepare_modlist {
     $self->modlist( $self->parse_modlist( $modlist_txt ) );
 }
 
+
+sub fetch_recent {
+    my ($self,$period) = @_;
+    $period ||= '1d';
+
+    # http://search.cpan.org/CPAN/RECENT-1M.json
+    # http://ftp.nara.wide.ad.jp/pub/CPAN/RECENT-1M.json
+    return $self->http_get( $self->mirror . '/RECENT-'. $period .'.json' );
+}
+
+sub recent {
+    my ($self,$period) = @_;
+    my $json = $self->fetch_recent( $period );
+    return decode_json( $json );
+}
+
 sub parse_modlist { 
     my ($self,$modlist_data) = @_;
 
@@ -232,12 +259,13 @@ sub module_source_path {
 sub http_get { 
     my ($self,$url,$cache_expiry) = @_;
 
+    debug "Downloading $url ...";
+
     if( $self->cache ) {
         my $c = $self->cache->get( $url );
         return $c if $c;
     }
 
-    debug "Downloading $url ...";
 
     my $ua = $self->new_ua;
     my $resp = $ua->get($url);
@@ -263,11 +291,11 @@ __END__
 
 =head1 NAME
 
-CPAN::Source - Fetch cpan source data and manipulate
+CPAN::Source - CPAN source list data aggregator.
 
 =head1 DESCRIPTION
 
-L<CPAN::Source> fetch, parse, integrate CPAN source list for you.
+L<CPAN::Source> fetch, parse, aggregate all CPAN source list for you.
 
 Currently CPAN::Source supports 4 files from CPAN mirror. (00whois.xml,
 contains cpan author information, 01mailrc.txt contains author emails, 
@@ -304,10 +332,6 @@ The distribution info is from L<CPAN::DistnameInfo>.
 
 =head2 new( OPTIONS )
 
-
-
-
-
 =head2 prepare_authors 
 
 =head2 prepare_mailrc
@@ -315,6 +339,38 @@ The distribution info is from L<CPAN::DistnameInfo>.
 =head2 prepare_modlist
 
 =head2 prepare_package_data
+
+
+=head1 ACCESSORS
+
+=for 4
+
+=item package_data
+
+which is a hashref, contains:
+
+    { 
+        meta => { 
+            File => ...
+            URL => ...
+            Description => ...
+            Line-Count => ...
+            Last-Updated => ...
+        },
+        packages => { 
+            'Foo::Bar' => {
+                class     => 'Foo::Bar',
+                version   =>  0.01 ,
+                path      =>  tar path,
+                dist      =>  dist name
+            }
+            ....
+        }
+    }
+
+=back
+
+
 
 
 =head1 AUTHOR

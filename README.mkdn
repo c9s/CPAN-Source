@@ -1,10 +1,10 @@
 # NAME
 
-CPAN::Source - Fetch cpan source data and manipulate
+CPAN::Source - CPAN source list data aggregator.
 
 # DESCRIPTION
 
-[CPAN::Source](http://search.cpan.org/perldoc?CPAN::Source) fetch, parse, integrate CPAN source list for you.
+[CPAN::Source](http://search.cpan.org/perldoc?CPAN::Source) fetch, parse, aggregate all CPAN source list for you.
 
 Currently CPAN::Source supports 4 files from CPAN mirror. (00whois.xml,
 contains cpan author information, 01mailrc.txt contains author emails, 
@@ -41,14 +41,6 @@ The distribution info is from [CPAN::DistnameInfo](http://search.cpan.org/perldo
 
 ## new( OPTIONS )
 
-
-
-
-
-
-
-
-
 ## prepare_authors 
 
 ## prepare_mailrc
@@ -56,6 +48,37 @@ The distribution info is from [CPAN::DistnameInfo](http://search.cpan.org/perldo
 ## prepare_modlist
 
 ## prepare_package_data
+
+
+
+# ACCESSORS
+
+- package_data
+
+which is a hashref, contains:
+
+    { 
+        meta => { 
+            File => ...
+            URL => ...
+            Description => ...
+            Line-Count => ...
+            Last-Updated => ...
+        },
+        packages => { 
+            'Foo::Bar' => {
+                class     => 'Foo::Bar',
+                version   =>  0.01 ,
+                path      =>  tar path,
+                dist      =>  dist name
+            }
+            ....
+        }
+    }
+
+
+
+
 
 
 

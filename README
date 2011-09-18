@@ -1,8 +1,8 @@
 NAME
-    CPAN::Source - Fetch cpan source data and manipulate
+    CPAN::Source - CPAN source list data aggregator.
 
 DESCRIPTION
-    CPAN::Source fetch, parse, integrate CPAN source list for you.
+    CPAN::Source fetch, parse, aggregate all CPAN source list for you.
 
     Currently CPAN::Source supports 4 files from CPAN mirror. (00whois.xml,
     contains cpan author information, 01mailrc.txt contains author emails,
@@ -42,6 +42,29 @@ FUNCTIONS
   prepare_mailrc
   prepare_modlist
   prepare_package_data
+ACCESSORS
+    package_data
+        which is a hashref, contains:
+
+            { 
+                meta => { 
+                    File => ...
+                    URL => ...
+                    Description => ...
+                    Line-Count => ...
+                    Last-Updated => ...
+                },
+                packages => { 
+                    'Foo::Bar' => {
+                        class     => 'Foo::Bar',
+                        version   =>  0.01 ,
+                        path      =>  tar path,
+                        dist      =>  dist name
+                    }
+                    ....
+                }
+            }
+
 AUTHOR
     Yo-An Lin <cornelius.howl {at} gmail.com>
 
@@ -49,4 +72,11 @@ SEE ALSO
 LICENSE
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 348:
+        '=item' outside of any '=over'
 
