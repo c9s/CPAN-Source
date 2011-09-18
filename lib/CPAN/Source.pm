@@ -33,7 +33,7 @@ has mirror =>
 has source_mirror =>
     is => 'rw',
     isa => 'Str',
-    default => 'http://cpansearch.perl.org/';
+    default => sub { 'http://cpansearch.perl.org/' };
 
 # data accessors
 
@@ -140,11 +140,13 @@ sub prepare_package_data {
     my $cnt = 0;
     my $size = scalar @lines;
 
+    local $|;
+
     for ( @lines ) {
         my ( $class,$version,$path) = split /\s+/;
         $version = 0 if $version eq 'undef';
 
-        printf("\r [%d/%d] " , $cnt++ , $size) if DEBUG;
+        printf("\r [%d/%d] " , ++$cnt , $size) if DEBUG;
 
         my $tar_path = $self->mirror . '/authors/id/' . $path;
         my $d = CPAN::DistnameInfo->new( $tar_path );
@@ -212,7 +214,8 @@ sub parse_mailrc {
 
 sub module_source_path {
     my ($self,$d) = ($_[0], $_[1]);
-    return $self->source_mirror . '/' . $d->cpanid . '/' . $d->distvname;
+    return undef unless $d->distvname;
+    return ( $self->source_mirror . '/' . $d->cpanid . '/' . $d->distvname );
 }
 
 sub http_get { 
