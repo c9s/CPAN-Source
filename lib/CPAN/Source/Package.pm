@@ -16,8 +16,7 @@ has path =>
     isa => 'Str';
 
 has dist => 
-    is => 'rw';
-
-
+    is => 'rw',
+    isa => 'CPAN::Source::Dist';
 
 1;

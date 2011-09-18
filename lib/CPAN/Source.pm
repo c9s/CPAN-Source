@@ -175,14 +175,12 @@ sub prepare_package_data {
 
         my $tar_path = $self->mirror . '/authors/id/' . $path;
 
+        my $dist;
         my $d = CPAN::DistnameInfo->new( $tar_path );
-
         if( $d->version ) {
-            my $distinfo = { 
-                $d->properties,
-                source_mirror => $self->module_source_path($d),
-            };
-            $self->dists->{ $d->dist } = $distinfo unless $self->dists->{ $d->dist };
+            $dist = $self->new_dist( $d );
+            $self->dists->{ $dist->dist } = $dist 
+                unless $self->dists->{ $d->dist };
         }
 
         # Moose::Foo => {  ..... }
@@ -190,8 +188,9 @@ sub prepare_package_data {
             class     => $class,
             version   => $version ,
             path      => $tar_path,
-            dist      => $d->dist,
+            dist      => $dist,
         );
+
     }
 
     my $result = { 
