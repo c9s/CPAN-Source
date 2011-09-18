@@ -17,6 +17,9 @@ use constant { DEBUG => $ENV{DEBUG} };
 
 our $VERSION = '0.01';
 
+
+# options ...
+
 has cache_path => 
     is => 'rw',
     isa => 'Str';
@@ -36,12 +39,15 @@ has source_mirror =>
     isa => 'Str',
     default => sub { 'http://cpansearch.perl.org/' };
 
-# data accessors
 
+
+# data accessors
 has authors => 
     is => 'rw',
     isa => 'HashRef';
 
+
+# dist info from CPAN::DistnameInfo
 has dists =>
     is => 'rw',
     isa => 'HashRef',
