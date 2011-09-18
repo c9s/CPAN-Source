@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use lib 'lib';
 use CPAN::Source;
-use Test::More 'no_plan';
+use Test::More;
 
 my $source = CPAN::Source->new( 
     mirror => 'http://cpan.nctu.edu.tw',
@@ -24,10 +24,4 @@ while( my ($k,$v) = each %{ $source->dists } ) {
     ok( $v->cpanid );
 }
 
-
-my ($pkg_name,$pkg) = each %{ $source->package_data };
-ok( $pkg_name , $pkg_name );
-ok( $pkg );
-my $pm_content = $pkg->fetch_pm;
-ok( $pm_content );
-warn $pm_content;
+done_testing();

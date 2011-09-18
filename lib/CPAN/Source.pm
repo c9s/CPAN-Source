@@ -302,6 +302,10 @@ sub module_source_path {
     return ( $self->source_mirror . '/src/' . $d->cpanid . '/' . $d->distvname );
 }
 
+sub package {
+    my ($self,$pkgname) = @_;
+    return $self->package_data->{packages}->{ $pkgname };
+}
 
 # return dist
 sub dist { 
@@ -407,6 +411,10 @@ The distribution info is from L<CPAN::DistnameInfo>.
 
     my $readme = $dist->fetch_readme;
     my $changes = $dist->fetch_changes;
+
+
+    my $pkg = $source->package( 'Moose' );
+    my $pm_content = $pkg->fetch_pm();
 
 =head1 ACCESSORS
 
