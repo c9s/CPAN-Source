@@ -364,8 +364,10 @@ The distribution info is from L<CPAN::DistnameInfo>.
     $meta_data->{resources}->{bugtracker};
     $meta_data->{resources}->{repository};
 
+    my $readme = $dist->fetch_readme;
+    my $changes = $dist->fetch_changes;
 
-=head1 FUNCTIONS
+=head1 METHODS
 
 =head2 new( OPTIONS )
 
