@@ -353,6 +353,18 @@ The distribution info is from L<CPAN::DistnameInfo>.
     $source->modlist;       # parsed package data from 03modlist.data.gz
     $source->mailrc;        # parsed mailrc data  from 01mailrc.txt.gz
 
+
+    my $dist = $source->dists('Moose');
+    my $distname = $dist->dist;
+    my $version = $dist->version;  # attributes from CPAN::DistnameInfo
+    my $meta_data = $dist->fetch_meta();
+
+    $meta_data->{abstract};
+    $meta_data->{version};
+    $meta_data->{resources}->{bugtracker};
+    $meta_data->{resources}->{repository};
+
+
 =head1 FUNCTIONS
 
 =head2 new( OPTIONS )
