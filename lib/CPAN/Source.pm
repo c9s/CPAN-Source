@@ -416,6 +416,9 @@ The distribution info is from L<CPAN::DistnameInfo>.
     my $pkg = $source->package( 'Moose' );
     my $pm_content = $pkg->fetch_pm();
 
+
+    my $mirror_server_timestamp = $source->stamp;  # DateTime object
+
 =head1 ACCESSORS
 
 =for 4
