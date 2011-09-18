@@ -355,7 +355,8 @@ The distribution info is from L<CPAN::DistnameInfo>.
 
 
     my $dist = $source->dists('Moose');
-    my $distname = $dist->dist;
+    my $distname = $dist->name;
+    my $distvname = $dist->version_name;
     my $version = $dist->version;  # attributes from CPAN::DistnameInfo
     my $meta_data = $dist->fetch_meta();
 

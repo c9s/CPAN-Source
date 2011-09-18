@@ -7,8 +7,9 @@ use YAML::XS;
 use URI;
 use overload '""' => \&to_string;
 
-has dist => is => 'rw', isa => 'Str';
-has distvname => is => 'rw';
+has name => is => 'rw', isa => 'Str';
+has version_name => is => 'rw';
+
 has version => is => 'rw', isa => 'Str';
 has maturity => is => 'rw';
 has filename => is => 'rw';
@@ -20,8 +21,9 @@ has source_path => is => 'rw';
 has _parent => is => 'rw', isa => 'CPAN::Source';
 
 sub BUILD {
-    my $self = shift;
-
+    my ($self,$args) = @_;
+    $args->{name}         = $args->{dist} if $args->{dist};
+    $args->{version_name} = $args->{distvname} if $args->{distvname};
 }
 
 
