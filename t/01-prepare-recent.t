@@ -1,18 +1,15 @@
 #!/usr/bin/env perl
 use lib 'lib';
-use CPAN::Source;
-use Test::More tests => 3;
+use Test::More tests => 6;
+use_ok( 'CPAN::Source' );
 
 my $source = CPAN::Source->new( 
     mirror => 'http://cpan.nctu.edu.tw',
     cache_path => '.cache' , 
     cache_expiry => '14 days' );
 
-my $pkg_data;
 ok( $source );
-ok( $pkg_data = $source->prepare_package_data );
-
-my $dist = $source->dist('Moose');
-
-ok( $dist );
-
+ok( $source->fetch_recent('1d') );
+ok( $source->fetch_recent('1M') );
+ok( $source->fetch_recent('1h') );
+ok( $source->recent('1h') );

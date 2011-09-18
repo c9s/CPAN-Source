@@ -202,6 +202,7 @@ sub prepare_package_data {
     return $result;
 }
 
+
 sub prepare_modlist {
     my $self = shift;
 
@@ -257,6 +258,14 @@ sub module_source_path {
     my ($self,$d) = ($_[0], $_[1]);
     return undef unless $d->distvname;
     return ( $self->source_mirror . '/src/' . $d->cpanid . '/' . $d->distvname );
+}
+
+
+# return dist
+sub dist { 
+    my ($self,$distname) = @_;
+    $distname =~ s/::/-/g;
+    return $self->dists->{ $distname };
 }
 
 sub http_get { 
