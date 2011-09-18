@@ -20,7 +20,7 @@ use CPAN::Source::Package;
 
 use constant { DEBUG => $ENV{DEBUG} };
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 # options ...
@@ -74,7 +74,7 @@ has stamp =>
     lazy => 1,
     default => sub { 
         my $self = shift;
-        my $content = $self->http_get( $self->mirror , '/modules/02STAMP' );
+        my $content = $self->fetch_stamp;
         my ( $ts , $date ) = split /\s/,$content;
         return DateTime->from_epoch( epoch => $ts );
     };
@@ -259,6 +259,12 @@ sub parse_mailrc {
 sub purge_cache {
     my $self = shift;
     $self->cache->purge;
+}
+
+sub fetch_stamp {
+    my $self = shift;
+    my $content = $self->http_get( $self->mirror . '/modules/02STAMP' );
+    return $content;
 }
 
 sub fetch_mirrors {

@@ -1,4 +1,7 @@
 Revision history for Perl extension CPAN::Source
 
+0.02    Mon 9/19 00:24:18 2011
+        - Add more accessors and tests
+
 0.01    Sun Sep 18 02:04:27 2011
         - original version
