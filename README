@@ -38,7 +38,8 @@ SYNOPSIS
 
 
         my $dist = $source->dists('Moose');
-        my $distname = $dist->dist;
+        my $distname = $dist->name;
+        my $distvname = $dist->version_name;
         my $version = $dist->version;  # attributes from CPAN::DistnameInfo
         my $meta_data = $dist->fetch_meta();
 
@@ -91,6 +92,6 @@ POD ERRORS
     Hey! The above document had some coding errors, which are explained
     below:
 
-    Around line 387:
+    Around line 388:
         '=item' outside of any '=over'
 

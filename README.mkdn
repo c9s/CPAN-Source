@@ -40,7 +40,8 @@ The distribution info is from [CPAN::DistnameInfo](http://search.cpan.org/perldo
 
 
     my $dist = $source->dists('Moose');
-    my $distname = $dist->dist;
+    my $distname = $dist->name;
+    my $distvname = $dist->version_name;
     my $version = $dist->version;  # attributes from CPAN::DistnameInfo
     my $meta_data = $dist->fetch_meta();
 
