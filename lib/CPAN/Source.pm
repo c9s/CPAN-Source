@@ -1,22 +1,267 @@
 package CPAN::Source;
-use strict;
 use warnings;
-our $VERSION = '0.01';
+use strict;
+use feature qw(say);
+use Try::Tiny;
+use URI;
+use Moose;
+use Compress::Zlib;
+use LWP::UserAgent;
+use XML::Simple qw(XMLin);
+use Cache::File;
+use DateTime::Format::HTTP;
+use YAML;
+use CPAN::DistnameInfo;
+
+use constant { DEBUG => $ENV{DEBUG} };
+
+
+has cache_path => 
+    is => 'rw',
+    isa => 'Str';
+
+has cache_expiry => 
+    is => 'rw';
+
+has cache =>
+    is => 'rw';
+
+has mirror =>
+    is => 'rw',
+    isa => 'Str';
+
+has source_mirror =>
+    is => 'rw',
+    isa => 'Str',
+    default => 'http://cpansearch.perl.org/';
+
+# data accessors
+
+has authors => 
+    is => 'rw',
+    isa => 'HashRef';
+
+has package_data =>
+    is => 'rw',
+    isa => 'HashRef';
+
+has modlist => 
+    is => 'rw',
+    isa => 'HashRef';
+
+has mailrc =>
+    is => 'rw',
+    isa => 'HashRef';
+
+sub debug { 
+    say "[DEBUG] " ,@_ if DEBUG;
+}
+
+sub BUILD {
+    my ($self,$args) = @_;
+    if( $args->{ cache_path } ) {
+        my $cache = Cache::File->new( 
+            cache_root => $args->{cache_path},
+            default_expires => $args->{cache_expiry} || '3 minutes' );
+        $self->cache( $cache );
+    }
+
+    $|++ if DEBUG;
+}
+
+sub prepare {
+    my ($self) = @_;
+    $self->prepare_authors;
+    $self->prepare_mailrc;
+    $self->prepare_package_data;
+    $self->prepare_modlist;
+}
+
+sub prepare_authors { 
+    my $self = shift;
+
+    debug "Prepare authors data...";
+
+    my $xml = $self->http_get( $self->mirror . '/authors/00whois.xml');
+
+    debug "Building authors data...";
+
+    my $authors = XMLin( $xml )->{cpanid};
+    $self->authors( $authors );
+    return $authors;
+}
+
+sub prepare_mailrc {
+    my $self = shift;
+
+    debug "Prepare mailrc data...";
+
+    my $mailrc_txt = _decode_gzip( $self->http_get( $self->mirror . '/authors/01mailrc.txt.gz') );
+    $self->mailrc( $self->parse_mailrc( $mailrc_txt ) );
+}
+
+sub prepare_package_data {
+    my $self = shift;
+
+    debug "Prepare pacakge data...";
+
+    my $content = _decode_gzip( $self->http_get( $self->mirror . '/modules/02packages.details.txt.gz' ) );
+
+    my @lines = split /\n/,$content;
+
+    # File:         02packages.details.txt
+    # URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
+    # Description:  Package names found in directory $CPAN/authors/id/
+    # Columns:      package name, version, path
+    # Intended-For: Automated fetch routines, namespace documentation.
+    # Written-By:   PAUSE version 1.14
+    # Line-Count:   93553
+    # Last-Updated: Thu, 08 Sep 2011 13:38:39 GMT
+
+    my $meta = {  };
+
+    # strip meta tags
+    my @meta_lines = splice @lines,0,9;
+    for( @meta_lines ) {
+        next unless $_;
+        my ($attr,$val) = m{^(.*?):\s*(.*?)$};
+        $meta->{$attr} = $val;
+
+        debug "meta: $attr => $val ";
+    }
+
+    $meta->{'URL'} = URI->new( $meta->{'URL'} );
+    $meta->{'Line-Count'} = int( $meta->{'Line-Count'} );
+    $meta->{'Last-Updated'} = 
+          DateTime::Format::HTTP->parse_datetime( $meta->{'Last-Updated'} );
+
+    my $packages = {  };
+
+    my $cnt = 0;
+    my $size = scalar @lines;
+
+    for ( @lines ) {
+        my ( $class,$version,$path) = split /\s+/;
+        $version = 0 if $version eq 'undef';
+
+        printf("\r [%d/%d] " , $cnt++ , $size) if DEBUG;
+
+        my $tar_path = $self->mirror . '/authors/id/' . $path;
+        my $d = CPAN::DistnameInfo->new( $tar_path );
+
+        # Moose::Foo => {  ..... }
+        $packages->{ $class } = { 
+            class     => $class,
+            version   => $version ,
+            path      => $tar_path,
+
+            pauseid   => $d->cpanid,
+            dist      => $d->dist,
+            distvname => $d->distvname,
+            filename  => $d->filename,
+            maturity  => $d->maturity,  # "released"
+
+            source_mirror => $self->module_source_path($d),
+        };
+    }
+
+    my $result = { 
+        meta => $meta,
+        packages => $packages,
+    };
+
+    $self->package_data( $result );
+    return $result;
+}
+
+sub prepare_modlist {
+    my $self = shift;
+
+    debug "Prepare modlist data...";
+    my $modlist_txt = _decode_gzip( $self->http_get( $self->mirror . '/modules/03modlist.data.gz' ));
+
+    $self->modlist( $self->parse_modlist( $modlist_txt ) );
+}
+
+sub parse_modlist { 
+    my ($self,$modlist_data) = @_;
+
+    debug "Building modlist data ...";
+
+    my @lines = split(/\n/,$modlist_data);
+    splice @lines,0,10;
+    $modlist_data = join "\n", @lines;
+    eval $modlist_data;
+    return CPAN::Modulelist->data;
+}
+
+sub parse_mailrc { 
+    my ($self,$mailrc_txt) = @_;
+
+    debug "Parsing mailrc ...";
+
+    my @lines = split /\n/,$mailrc_txt;
+    my %result;
+    for ( @lines ) {
+        my ($abbr,$name,$email) = ( $_ =~ m{^alias\s+(.*?)\s+"(.*?)\s*<(.*?)>"} );
+        $result{ $abbr } = { name => $name , email => $email };
+    }
+    return \%result;
+}
+
+
+sub module_source_path {
+    my ($self,$d) = ($_[0], $_[1]);
+    return $self->source_mirror . '/' . $d->cpanid . '/' . $d->distvname;
+}
+
+sub http_get { 
+    my ($self,$url,$cache_expiry) = @_;
+
+    if( $self->cache ) {
+        my $c = $self->cache->get( $url );
+        return $c if $c;
+    }
+
+    debug "Downloading $url ...";
+
+    my $ua = $self->new_ua;
+    my $resp = $ua->get($url);
+
+    $self->cache->set( $url , $resp->content , $cache_expiry ) if $self->cache;
+    return $resp->content;
+}
+
+sub new_ua {
+    my $self = shift;
+    my $ua = LWP::UserAgent->new;
+    $ua->env_proxy;
+    return $ua;
+}
+
+sub _decode_gzip {
+    return Compress::Zlib::memGunzip( $_[0] );
+}
 
 1;
 __END__
+=pod
 
 =head1 NAME
 
-CPAN::Source -
-
-=head1 SYNOPSIS
-
-  use CPAN::Source;
+CPAN::Source - Fetch cpan source data and manipulate
 
 =head1 DESCRIPTION
 
-CPAN::Source is
+=head1 SYNOPSIS
+
+    my $source = CPAN::Source->new(  mirror => 'http://cpan.nctu.edu.tw' );
+    $source->prepare;   # use LWP::UserAgent to fetch source list files ...
+
+    # 00whois.xml
+    # 01mailrc
+    # 02packages.details.txt
+    # 03modlist
 
 =head1 AUTHOR
 

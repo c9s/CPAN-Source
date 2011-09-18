@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+use lib 'lib';
+use Test::More tests => 3;
+use_ok( 'CPAN::Source' );
+
+my $source = CPAN::Source->new( 
+    mirror => 'http://cpan.nctu.edu.tw',
+    cache_path => '.cache' , 
+    cache_expiry => '14 days' );
+
+ok( $source );
+ok( $source->prepare_mailrc );
+
+# ok( $pkg_data = $source->prepare_package_data );
+# ok( $source->prepare_modlist );
