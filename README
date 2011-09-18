@@ -36,6 +36,17 @@ SYNOPSIS
         $source->modlist;       # parsed package data from 03modlist.data.gz
         $source->mailrc;        # parsed mailrc data  from 01mailrc.txt.gz
 
+
+        my $dist = $source->dists('Moose');
+        my $distname = $dist->dist;
+        my $version = $dist->version;  # attributes from CPAN::DistnameInfo
+        my $meta_data = $dist->fetch_meta();
+
+        $meta_data->{abstract};
+        $meta_data->{version};
+        $meta_data->{resources}->{bugtracker};
+        $meta_data->{resources}->{repository};
+
 FUNCTIONS
   new( OPTIONS )
   prepare_authors
@@ -77,6 +88,6 @@ POD ERRORS
     Hey! The above document had some coding errors, which are explained
     below:
 
-    Around line 348:
+    Around line 385:
         '=item' outside of any '=over'
 
