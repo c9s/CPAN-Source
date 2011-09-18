@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-use Test::More tests => 6;
+use Test::More no_plan => 1;
 use CPAN::Source;
 use CPAN::Source::Dist;
 
@@ -7,7 +7,7 @@ my $source = CPAN::Source->new;
 
 my $dist = CPAN::Source::Dist->new( 
     name => 'Moose', 
-    version_name => 'Moose-2.0205'
+    version_name => 'Moose-2.0205',
     version => '2.0205', 
     source_path => 'http://cpansearch.perl.org/src/DOY/Moose-2.0205',
     _parent => $source );

@@ -56,7 +56,21 @@ METHODS
   prepare_authors
   prepare_mailrc
   prepare_modlist
+    Download 03modlist.data.gz and parse it.
+
   prepare_package_data
+    Download 02packages.details.gz and parse it.
+
+  module_source_path
+    Return full-qualified source path. built from source mirror, the default
+    source mirror is <http://cpansearch.perl.org>.
+
+  http_get
+    Use LWP::UserAgent to fetch content.
+
+  new_dist
+    Convert CPAN::DistnameInfo into CPAN::Source::Dist.
+
 ACCESSORS
     package_data
         which is a hashref, contains:
@@ -92,6 +106,6 @@ POD ERRORS
     Hey! The above document had some coding errors, which are explained
     below:
 
-    Around line 388:
+    Around line 404:
         '=item' outside of any '=over'
 

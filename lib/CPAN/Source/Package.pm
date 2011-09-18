@@ -20,5 +20,12 @@ has dist =>
 #    isa => 'CPAN::Source::Dist';
 
 
+sub fetch_pm { 
+    my $self = shift;
+    my $path = $self->class;
+    $path =~ s{::}{/}g;
+    $path = 'lib/' . $path . '.pm';
+    return $self->dist->fetch_source_file( $path );
+}
 
 1;

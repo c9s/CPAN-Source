@@ -180,9 +180,10 @@ sub prepare_package_data {
         my $dist;
         my $d = CPAN::DistnameInfo->new( $tar_path );
         if( $d->version ) {
+            # register "Foo-Bar" to dists hash...
             $dist = $self->new_dist( $d );
-            $self->dists->{ $dist->dist } = $dist 
-                unless $self->dists->{ $d->dist };
+            $self->dists->{ $dist->name } = $dist 
+                unless $self->dists->{ $dist->name };
         }
 
         # Moose::Foo => {  ..... }
@@ -378,8 +379,23 @@ The distribution info is from L<CPAN::DistnameInfo>.
 
 =head2 prepare_modlist
 
+Download 03modlist.data.gz and parse it.
+
 =head2 prepare_package_data
 
+Download 02packages.details.gz and parse it.
+
+=head2 module_source_path
+
+Return full-qualified source path. built from source mirror, the default source mirror is L<http://cpansearch.perl.org>.
+
+=head2 http_get
+
+Use L<LWP::UserAgent> to fetch content.
+
+=head2 new_dist
+
+Convert L<CPAN::DistnameInfo> into L<CPAN::Source::Dist>.
 
 =head1 ACCESSORS
 

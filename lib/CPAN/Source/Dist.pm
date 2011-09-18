@@ -8,6 +8,7 @@ use URI;
 use overload '""' => \&to_string;
 
 has name => is => 'rw', isa => 'Str';
+
 has version_name => is => 'rw';
 
 has version => is => 'rw', isa => 'Str';
@@ -22,10 +23,15 @@ has _parent => is => 'rw', isa => 'CPAN::Source';
 
 sub BUILD {
     my ($self,$args) = @_;
-    $args->{name}         = $args->{dist} if $args->{dist};
-    $args->{version_name} = $args->{distvname} if $args->{distvname};
+    $self->name( $args->{dist} ) if $args->{dist};
+    $self->version_name( $args->{distvname} ) if $args->{distvname};
 }
 
+
+# CPAN::DistnameInfo compatible
+sub dist { $_[0]->name; }
+
+sub distvname { $_[0]->version_name; }
 
 sub fetch_source_file { 
     my ($self,$file) = @_;
@@ -56,6 +62,11 @@ sub fetch_todo {
     my $self = shift;
     return $self->fetch_source_file( 'TODO' )
         || $self->fetch_source_file( 'Todo' );
+}
+
+sub fetch_tarball { 
+
+
 }
 
 sub to_string { 

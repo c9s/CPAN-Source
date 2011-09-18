@@ -63,9 +63,23 @@ The distribution info is from [CPAN::DistnameInfo](http://search.cpan.org/perldo
 
 ## prepare_modlist
 
+Download 03modlist.data.gz and parse it.
+
 ## prepare_package_data
 
+Download 02packages.details.gz and parse it.
 
+## module_source_path
+
+Return full-qualified source path. built from source mirror, the default source mirror is [http://cpansearch.perl.org](http://cpansearch.perl.org).
+
+## http_get
+
+Use [LWP::UserAgent](http://search.cpan.org/perldoc?LWP::UserAgent) to fetch content.
+
+## new_dist
+
+Convert [CPAN::DistnameInfo](http://search.cpan.org/perldoc?CPAN::DistnameInfo) into [CPAN::Source::Dist](http://search.cpan.org/perldoc?CPAN::Source::Dist).
 
 # ACCESSORS
 
