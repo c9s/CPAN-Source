@@ -5,6 +5,7 @@ perl_version '5.10';
 all_from 'lib/CPAN/Source.pm';
 
 readme_markdown_from 'lib/CPAN/Source.pm';
+readme_from_pod      'lib/CPAN/Source.pm';
 
 requires 'Try::Tiny';
 requires $_ for qw(URI Moose Compress::Zlib LWP::UserAgent XML::Simple Cache::File DateTime::Format::HTTP YAML CPAN::DistnameInfo);

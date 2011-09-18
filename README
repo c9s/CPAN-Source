@@ -1,27 +1,52 @@
-This is Perl module CPAN::Source.
+NAME
+    CPAN::Source - Fetch cpan source data and manipulate
 
-INSTALLATION
+DESCRIPTION
+    CPAN::Source fetch, parse, integrate CPAN source list for you.
 
-CPAN::Source installation is straightforward. If your CPAN shell is set up,
-you should just be able to do
+    Currently CPAN::Source supports 4 files from CPAN mirror. (00whois.xml,
+    contains cpan author information, 01mailrc.txt contains author emails,
+    02packages.details.txt contains package information, 03modlist contains
+    distribution status)
 
-    % cpan CPAN::Source
+    CPAN::Source aggregate those data, and information can be easily
+    retrieved.
 
-Download it, unpack it, then build it as per the usual:
+    The distribution info is from CPAN::DistnameInfo.
 
-    % perl Makefile.PL
-    % make && make test
+SYNOPSIS
+        my $source = CPAN::Source->new(  
+            cache_path => '.cache',
+            cache_expiry => '7 days',
+            mirror => 'http://cpan.nctu.edu.tw',
+            source_mirror => 'http://cpansearch.perl.org'
+        );
 
-Then install it:
+        $source->prepare;   # use LWP::UserAgent to fetch all source list files ...
 
-    % make install
+        # 00whois.xml
+        # 01mailrc
+        # 02packages.details.txt
+        # 03modlist
 
-DOCUMENTATION
+        $source->dists;  # all dist information
+        $source->authors;  # all author information
 
-CPAN::Source documentation is available as in POD. So you can do:
+        $source->package_data;  # parsed package data from 02packages.details.txt.gz
+        $source->modlist;       # parsed package data from 03modlist.data.gz
+        $source->mailrc;        # parsed mailrc data  from 01mailrc.txt.gz
 
-    % perldoc CPAN::Source
+FUNCTIONS
+  new( OPTIONS )
+  prepare_authors
+  prepare_mailrc
+  prepare_modlist
+  prepare_package_data
+AUTHOR
+    Yo-An Lin <cornelius.howl {at} gmail.com>
 
-to read the documentation online with your favorite pager.
+SEE ALSO
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 
-Yo-An Lin
