@@ -25,12 +25,35 @@ sub BUILD {
 }
 
 
+sub fetch_source_file { 
+    my ($self,$file) = @_;
+    return unless $self->source_path;
+    my $uri = URI->new( $self->source_path . '/' . $file );
+    return $self->_parent->http_get( $uri );
+}
+
 sub fetch_meta { 
     my $self = shift;
-    return unless $self->source_path;
-    my $uri = URI->new( $self->source_path . '/' . 'META.yml' );
-    my $meta_content = $self->_parent->http_get( $uri );
-    return YAML::XS::Load( $meta_content );
+    my $yaml = $self->fetch_source_file( 'META.yml' );
+    return YAML::XS::Load( $yaml );
+}
+
+sub fetch_readme { 
+    my $self = shift;
+    return $self->fetch_source_file( 'README' );
+}
+
+sub fetch_changes {
+    my $self = shift;
+    return $self->fetch_source_file( 'Changes' )
+        || $self->fetch_source_file( 'Changelog' );
+        || $self->fetch_source_file( 'CHANGELOG' );
+}
+
+sub fetch_todo {
+    my $self = shift;
+    return $self->fetch_source_file( 'TODO' )
+      || $self->fetch_source_file( 'Todo' );
 }
 
 sub to_string { 
