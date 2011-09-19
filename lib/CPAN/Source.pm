@@ -416,7 +416,7 @@ The distribution info is from L<CPAN::DistnameInfo>.
     $source->mailrc;        # parsed mailrc data  from 01mailrc.txt.gz
 
 
-    my $dist = $source->dists('Moose');
+    my $dist = $source->dist('Moose');
     my $distname = $dist->name;
     my $distvname = $dist->version_name;
     my $version = $dist->version;  # attributes from CPAN::DistnameInfo
