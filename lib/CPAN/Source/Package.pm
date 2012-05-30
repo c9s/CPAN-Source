@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use base qw(Class::Accessor::Fast::XS);
 __PACKAGE__->mk_accessors(qw(
-    class
+    package
     version
     path
     dist
@@ -11,7 +11,7 @@ __PACKAGE__->mk_accessors(qw(
 
 sub fetch_pm { 
     my $self = shift;
-    my $path = $self->class;
+    my $path = $self->package;
     $path =~ s{::}{/}g;
     $path = 'lib/' . $path . '.pm';
     return $self->dist->fetch_source_file( $path );

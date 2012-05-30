@@ -5,6 +5,7 @@ use base qw(Class::Accessor::Fast::XS);
 __PACKAGE__->mk_accessors(qw(
     name 
     version_name 
+    package_name
     version 
     maturity 
     filename 
@@ -75,9 +76,7 @@ sub data {
 }
 
 sub to_string { 
-    my $self = shift;
-    my $data = $self->data();
-    return encode_json( $data );
+    return encode_json( $_[0]->data );
 }
 
 1;

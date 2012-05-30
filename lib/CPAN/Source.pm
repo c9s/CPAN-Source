@@ -259,7 +259,7 @@ sub fetch_package_data {
     local $|;
 
     for ( @lines ) {
-        my ($class,$version,$path) = split /\s+/;
+        my ($package_name,$version,$path) = split /\s+/;
 
         printf("\r[% 7d/%d] " , ++$cnt , $size ) if DEBUG;
 
@@ -268,20 +268,20 @@ sub fetch_package_data {
         my $tar_path = $self->mirror . '/authors/id/' . $path;
         my $dist;
 
-        # debug "Processing $class from $tar_path...";
+        # debug "Processing $package_name from $tar_path...";
 
         # Which parses informatino from dist path
         my $d = CPAN::DistnameInfo->new( $tar_path );
         if( $d->version ) {
             # register "Foo-Bar" to dists hash...
-            $dist = $self->new_dist( $d );
+            $dist = $self->new_dist( $d , $package_name );
             $self->dists->{ $dist->name } = $dist 
                 unless $self->dists->{ $dist->name };
         }
 
         # Moose::Foo => {  ..... }
-        $self->packages->{ $class } = CPAN::Source::Package->new({
-            class     => $class,
+        $self->packages->{ $package_name } = CPAN::Source::Package->new({
+            package   => $package_name,
             version   => $version,
             path      => $tar_path,
             dist      => $dist,
@@ -384,12 +384,13 @@ sub http_get {
 
 
 sub new_dist {
-    my ($self,$d) = @_;
+    my ($self,$d, $package_name) = @_;
     my %props = $d->properties;
     my $dist = CPAN::Source::Dist->new({
         %props,  # Hash
-        name => $props{dist},
+        name => $props{dist},  # Dist-Name
         version_name => $props{distvname},
+        package_name => $package_name,
         source_path => $self->module_source_path($d),
         _parent => $self,
     });
@@ -510,7 +511,7 @@ Which is a hashref, contains:
         },
         packages => { 
             'Foo::Bar' => {
-                class     => 'Foo::Bar',
+                package   => 'Foo::Bar',
                 version   =>  0.01 ,
                 path      =>  tar path,
                 dist      =>  dist name
