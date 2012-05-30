@@ -116,16 +116,13 @@ sub prepare {
     $self->prepare_modlist;
 }
 
-sub prepare_authors { 
+sub prepare_authors {
     my $self = shift;
 
     debug "Prepare authors data...";
 
-    my $xml = $self->fetch_whois;
+    my $authors = $self->fetch_whois;
 
-    debug "Parsing authors data...";
-
-    my $authors = XMLin( $xml )->{cpanid};
     $self->authors( $authors );
     return $authors;
 }
@@ -142,77 +139,7 @@ sub prepare_package_data {
 
     debug "Prepare pacakge data...";
 
-    my $content = _decode_gzip( $self->fetch_package_data );
-
-
-    debug "Parsing package data...";
-
-    my @lines = split /\n/,$content;
-
-    # File:         02packages.details.txt
-    # URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
-    # Description:  Package names found in directory $CPAN/authors/id/
-    # Columns:      package name, version, path
-    # Intended-For: Automated fetch routines, namespace documentation.
-    # Written-By:   PAUSE version 1.14
-    # Line-Count:   93553
-    # Last-Updated: Thu, 08 Sep 2011 13:38:39 GMT
-
-    my $meta = {  };
-
-    # strip meta tags
-    my @meta_lines = splice @lines,0,9;
-    for( @meta_lines ) {
-        next unless $_;
-        my ($attr,$val) = m{^(.*?):\s*(.*?)$};
-        $meta->{$attr} = $val;
-
-        debug "meta: $attr => $val ";
-    }
-
-    $meta->{'URL'} = URI->new( $meta->{'URL'} );
-    $meta->{'Line-Count'} = int( $meta->{'Line-Count'} );
-    $meta->{'Last-Updated'} = 
-          DateTime::Format::HTTP->parse_datetime( $meta->{'Last-Updated'} );
-
-    my $packages = {  };
-    my $cnt = 0;
-    my $size = scalar @lines;
-
-    local $|;
-
-    for ( @lines ) {
-        my ( $class,$version,$path) = split /\s+/;
-        $version = 0 if $version eq 'undef';
-
-        printf("\r [%d/%d] " , ++$cnt , $size) if DEBUG;
-
-        my $tar_path = $self->mirror . '/authors/id/' . $path;
-
-        my $dist;
-        my $d = CPAN::DistnameInfo->new( $tar_path );
-        if( $d->version ) {
-            # register "Foo-Bar" to dists hash...
-            $dist = $self->new_dist( $d );
-            $self->dists->{ $dist->name } = $dist 
-                unless $self->dists->{ $dist->name };
-        }
-
-        # Moose::Foo => {  ..... }
-        $packages->{ $class } = CPAN::Source::Package->new( 
-            class     => $class,
-            version   => $version ,
-            path      => $tar_path,
-            dist      => $dist,
-        );
-
-    }
-
-    my $result = { 
-        meta => $meta,
-        packages => $packages,
-    };
-
+    my $result = $self->fetch_package_data;
     $self->package_data( $result );
     return $result;
 }
@@ -283,7 +210,76 @@ sub fetch_mailrc {
 
 sub fetch_package_data {
     my $self = shift;
-    return $self->http_get( $self->mirror . '/modules/02packages.details.txt.gz' );
+    my $gz =  $self->http_get( $self->mirror . '/modules/02packages.details.txt.gz' );
+    my $content = _decode_gzip($gz);
+
+    debug "Parsing package data...";
+
+    my @lines = split /\n/,$content;
+
+    # File:         02packages.details.txt
+    # URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
+    # Description:  Package names found in directory $CPAN/authors/id/
+    # Columns:      package name, version, path
+    # Intended-For: Automated fetch routines, namespace documentation.
+    # Written-By:   PAUSE version 1.14
+    # Line-Count:   93553
+    # Last-Updated: Thu, 08 Sep 2011 13:38:39 GMT
+
+    my $meta = {  };
+
+    # strip meta tags
+    my @meta_lines = splice @lines,0,9;
+    for( @meta_lines ) {
+        next unless $_;
+        my ($attr,$val) = m{^(.*?):\s*(.*?)$};
+        $meta->{$attr} = $val;
+
+        debug "meta: $attr => $val ";
+    }
+
+    $meta->{'URL'} = URI->new( $meta->{'URL'} );
+    $meta->{'Line-Count'} = int( $meta->{'Line-Count'} );
+    $meta->{'Last-Updated'} = 
+          DateTime::Format::HTTP->parse_datetime( $meta->{'Last-Updated'} );
+
+    my $packages = {  };
+    my $cnt = 0;
+    my $size = scalar @lines;
+
+    local $|;
+
+    for ( @lines ) {
+        my ( $class,$version,$path) = split /\s+/;
+        $version = 0 if $version eq 'undef';
+
+        printf("\r [%d/%d] " , ++$cnt , $size) if DEBUG;
+
+        my $tar_path = $self->mirror . '/authors/id/' . $path;
+
+        my $dist;
+        my $d = CPAN::DistnameInfo->new( $tar_path );
+        if( $d->version ) {
+            # register "Foo-Bar" to dists hash...
+            $dist = $self->new_dist( $d );
+            $self->dists->{ $dist->name } = $dist 
+                unless $self->dists->{ $dist->name };
+        }
+
+        # Moose::Foo => {  ..... }
+        $packages->{ $class } = CPAN::Source::Package->new( 
+            class     => $class,
+            version   => $version ,
+            path      => $tar_path,
+            dist      => $dist,
+        );
+
+    }
+
+    return { 
+        meta => $meta,
+        packages => $packages,
+    };
 }
 
 sub fetch_modlist_data {
@@ -293,7 +289,23 @@ sub fetch_modlist_data {
 
 sub fetch_whois {
     my $self = shift;
-    return $self->http_get( $self->mirror . '/authors/00whois.xml');
+
+    if( $self->cache ) {
+        my $c = $self->cache->get('json_00whois.xml');
+        return decode_json($c) if $c;
+    }
+
+    my $xml = $self->http_get( $self->mirror . '/authors/00whois.xml');
+
+    debug "Parsing authors data...";
+
+    my $authors = XMLin( $xml )->{cpanid};
+
+    # cache this with json
+    if( $self->cache ) {
+        $self->cache->set('json_00whois.xml', encode_json($authors) );
+    }
+    return $authors;
 }
 
 sub fetch_module_rss { 

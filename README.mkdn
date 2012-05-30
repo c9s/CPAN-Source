@@ -39,7 +39,7 @@ The distribution info is from [CPAN::DistnameInfo](http://search.cpan.org/perldo
 
 
 
-    my $dist = $source->dists('Moose');
+    my $dist = $source->dist('Moose');
     my $distname = $dist->name;
     my $distvname = $dist->version_name;
     my $version = $dist->version;  # attributes from CPAN::DistnameInfo
@@ -72,7 +72,7 @@ Which is a hashref, contains:
         {pauseId} => { ... }
     }
 
-- package_data
+- package\_data
 
 Which is a hashref, contains:
 
@@ -101,19 +101,19 @@ Which is a hashref, contains:
 
 
 
-## prepare_authors
+## prepare\_authors
 
-## prepare_mailrc
+## prepare\_mailrc
 
-## prepare_modlist
+## prepare\_modlist
 
 Download 03modlist.data.gz and parse it.
 
-## prepare_package_data
+## prepare\_package\_data
 
 Download 02packages.details.gz and parse it.
 
-## module_source_path
+## module\_source\_path
 
 Return full-qualified source path. built from source mirror, the default source mirror is [http://cpansearch.perl.org](http://cpansearch.perl.org).
 
@@ -121,21 +121,21 @@ Return full-qualified source path. built from source mirror, the default source 
 
 Return mirror info from mirror site. (07mirrors.json)
 
-## fetch_whois
+## fetch\_whois
 
-## fetch_mailrc
+## fetch\_mailrc
 
-## fetch_package_data
+## fetch\_package\_data
 
-## fetch_modlist_data
+## fetch\_modlist\_data
 
-## fetch_mirrors
+## fetch\_mirrors
 
-## fetch_module_rss
+## fetch\_module\_rss
 
 Return modules rss, from {Mirror}/modules/01modules.mtime.rss
 
-## fetch_recent( $period )
+## fetch\_recent( $period )
 
 Fetch recent updated modules,
 
@@ -146,15 +146,15 @@ Fetch recent updated modules,
 
 return [CPAN::Source::Dist](http://search.cpan.org/perldoc?CPAN::Source::Dist) object.
 
-## http_get
+## http\_get
 
 Use [LWP::UserAgent](http://search.cpan.org/perldoc?LWP::UserAgent) to fetch content.
 
-## new_dist
+## new\_dist
 
 Convert [CPAN::DistnameInfo](http://search.cpan.org/perldoc?CPAN::DistnameInfo) into [CPAN::Source::Dist](http://search.cpan.org/perldoc?CPAN::Source::Dist).
 
-## purge_cache 
+## purge\_cache 
 
 Purge cache.
 
