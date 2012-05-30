@@ -8,11 +8,19 @@ my $source = CPAN::Source->new(
     cache_path => '.cache' , 
     cache_expiry => '14 days' );
 
+{
+    my $path = 'J/JW/JWACH/Apache-FastForward-1.1.tar.gz';
+    my $dist = CPAN::DistnameInfo->new($path);
+    my $d = $source->new_dist($dist);
+    ok $d;
+    ok $d->name;
+    ok $d->version_name;
+}
+
 ok( $source->prepare_package_data );
 
 my $dist = $source->dist('Moose');
 ok( $dist );
-
 
 my $pkg = $source->package( 'Moose' );
 ok( $pkg );

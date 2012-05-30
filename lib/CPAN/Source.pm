@@ -280,12 +280,12 @@ sub fetch_package_data {
         }
 
         # Moose::Foo => {  ..... }
-        $self->packages->{ $class } = CPAN::Source::Package->new( 
+        $self->packages->{ $class } = CPAN::Source::Package->new({
             class     => $class,
             version   => $version,
             path      => $tar_path,
             dist      => $dist,
-        );
+        });
     }
 
     $self->packagelist_meta( $meta );
@@ -385,11 +385,14 @@ sub http_get {
 
 sub new_dist {
     my ($self,$d) = @_;
-    my $dist = CPAN::Source::Dist->new( 
-        $d->properties,
+    my %props = $d->properties;
+    my $dist = CPAN::Source::Dist->new({
+        %props,  # Hash
+        name => $props{dist},
+        version_name => $props{distvname},
         source_path => $self->module_source_path($d),
         _parent => $self,
-    );
+    });
     return $dist;
 }
 

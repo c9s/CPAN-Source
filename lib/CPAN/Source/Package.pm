@@ -1,23 +1,13 @@
 package CPAN::Source::Package;
 use warnings;
 use strict;
-use Mouse;
-
-has class =>
-    is => 'rw',
-    isa => 'Str';
-
-has version =>
-    is => 'rw';
-
-has path =>
-    is => 'rw',
-    isa => 'Str';
-
-has dist => 
-    is => 'rw';
-#    isa => 'CPAN::Source::Dist';
-
+use base qw(Class::Accessor::Fast::XS);
+__PACKAGE__->mk_accessors(qw(
+    class
+    version
+    path
+    dist
+));
 
 sub fetch_pm { 
     my $self = shift;

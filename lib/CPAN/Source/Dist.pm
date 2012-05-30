@@ -1,31 +1,44 @@
 package CPAN::Source::Dist;
 use warnings;
 use strict;
-use Mouse;
+use base qw(Class::Accessor::Fast::XS);
+__PACKAGE__->mk_accessors(qw(
+    name 
+    version_name 
+    version 
+    maturity 
+    filename 
+    cpanid 
+    extension 
+    pathname
+    source_path 
+    _parent
+));
 use JSON::XS;
 use YAML::XS;
 use URI;
 use overload '""' => \&to_string;
 
-has name => is => 'rw', isa => 'Str';
-
-has version_name => is => 'rw';
-
-has version => is => 'rw', isa => 'Str';
-has maturity => is => 'rw';
-has filename => is => 'rw';
-has cpanid => is => 'rw';
-has extension => is => 'rw';
-has pathname => is => 'rw';
-has source_path => is => 'rw';
-has _parent => is => 'rw', isa => 'CPAN::Source';
-
-sub BUILD {
-    my ($self,$args) = @_;
-    $self->name( $args->{dist} ) if $args->{dist};
-    $self->version_name( $args->{distvname} ) if $args->{distvname};
-}
-
+# use Mouse;
+# has name => is => 'rw', isa => 'Str';
+# 
+# has version_name => is => 'rw';
+# 
+# has version => is => 'rw', isa => 'Str';
+# 
+# has maturity => is => 'rw';
+# 
+# has filename => is => 'rw';
+# 
+# has cpanid => is => 'rw';
+# 
+# has extension => is => 'rw';
+# 
+# has pathname => is => 'rw';
+# 
+# has source_path => is => 'rw';
+# 
+# has _parent => is => 'rw', isa => 'CPAN::Source';
 
 # CPAN::DistnameInfo compatible
 sub dist { $_[0]->name; }
@@ -69,13 +82,17 @@ sub fetch_tarball {
 
 sub data { 
     my $self = shift;
-    my @attrs = $self->meta->get_all_attributes;
-    my $data = {  };
-    for my $attr ( @attrs ) {
-        next if $attr->name =~ /^_/; # skip private attribute
-        $data->{ $attr->name } = $attr->get_value( $self );
-    }
-    return $data;
+    return {
+        name  => $self->name,
+        version_name  => $self->version_name,
+        version => $self->version,
+        maturity  => $self->maturity,
+        filename  => $self->filename,
+        cpanid    => $self->cpanid,
+        extension => $self->extension,
+        pathname  => $self->pathname,
+        source_path => $self->source_path,
+    };
 }
 
 sub to_string { 
