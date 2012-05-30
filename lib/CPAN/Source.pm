@@ -57,7 +57,12 @@ has dists =>
     isa => 'HashRef',
     default => sub {  +{  } };
 
-has package_data =>
+has packages => 
+    is => 'rw',
+    isa => 'HashRef',
+    default => sub { +{  } };
+
+has packagelist_meta =>
     is => 'rw',
     isa => 'HashRef';
 
@@ -130,7 +135,7 @@ sub prepare_authors {
 sub prepare_mailrc {
     my $self = shift;
     debug "Prepare mailrc data...";
-    my $mailrc_txt = _decode_gzip($self->fetch_mailrc);
+    my $mailrc_txt = $self->fetch_mailrc;
     $self->mailrc( $self->parse_mailrc( $mailrc_txt ) );
 }
 
@@ -138,10 +143,11 @@ sub prepare_package_data {
     my $self = shift;
 
     debug "Prepare pacakge data...";
-
-    my $result = $self->fetch_package_data;
-    $self->package_data( $result );
-    return $result;
+    $self->fetch_package_data;
+    return { 
+        meta => $self->packagelist_meta,
+        packages => $self->packages,
+    };
 }
 
 
@@ -205,7 +211,8 @@ sub fetch_mirrors {
 
 sub fetch_mailrc {
     my $self = shift;
-    return $self->http_get( $self->mirror . '/authors/01mailrc.txt.gz');
+    my $gz = $self->http_get( $self->mirror . '/authors/01mailrc.txt.gz');
+    return _decode_gzip($gz);
 }
 
 sub fetch_package_data {
@@ -252,18 +259,18 @@ sub fetch_package_data {
     local $|;
 
     for ( @lines ) {
-        my ( $class,$version,$path) = split /\s+/;
-        $version = 0 if $version eq 'undef';
+        my ($class,$version,$path) = split /\s+/;
 
-        printf("\r [%d/%d] " , ++$cnt , $size) if DEBUG;
+        printf("\r[% 7d/%d] " , ++$cnt , $size ) if DEBUG;
+
+        $version = undef if $version eq 'undef';
 
         my $tar_path = $self->mirror . '/authors/id/' . $path;
-
         my $dist;
 
-        debug "Processing $class from $tar_path...";
+        # debug "Processing $class from $tar_path...";
 
-        # Which fetchs cpan dist file and parse the meta-data.
+        # Which parses informatino from dist path
         my $d = CPAN::DistnameInfo->new( $tar_path );
         if( $d->version ) {
             # register "Foo-Bar" to dists hash...
@@ -273,19 +280,15 @@ sub fetch_package_data {
         }
 
         # Moose::Foo => {  ..... }
-        $packages->{ $class } = CPAN::Source::Package->new( 
+        $self->packages->{ $class } = CPAN::Source::Package->new( 
             class     => $class,
-            version   => $version ,
+            version   => $version,
             path      => $tar_path,
             dist      => $dist,
         );
-
     }
 
-    return { 
-        meta => $meta,
-        packages => $packages,
-    };
+    $self->packagelist_meta( $meta );
 }
 
 sub fetch_modlist_data {
@@ -344,7 +347,7 @@ sub author {
 # return package obj
 sub package {
     my ($self,$pkgname) = @_;
-    return $self->package_data->{packages}->{ $pkgname };
+    return $self->packages->{ $pkgname };
 }
 
 # return dist
@@ -357,9 +360,6 @@ sub dist {
 sub http_get { 
     my ($self,$url,$cache_expiry) = @_;
 
-
-    debug "Downloading $url ...";
-
     if( $self->cache ) {
         my $c = $self->cache->get( $url );
         return $c if $c;
@@ -367,11 +367,13 @@ sub http_get {
 
     my $content;
     if( -e $url ) {
+        debug "Reading file $url ...";
         local $/;
         open FH , '<' , $url;
         $content = <FH>;
         close FH;
     } else {
+        debug "Downloading $url ...";
         my $ua = $self->new_ua;
         my $resp = $ua->get($url);
         $content = $resp->content;
@@ -441,7 +443,7 @@ The distribution info is from L<CPAN::DistnameInfo>.
     $source->dists;  # all dist information
     $source->authors;  # all author information
 
-    $source->package_data;  # parsed package data from 02packages.details.txt.gz
+    $source->packages;      # parsed package data from 02packages.details.txt.gz
     $source->modlist;       # parsed package data from 03modlist.data.gz
     $source->mailrc;        # parsed mailrc data  from 01mailrc.txt.gz
 

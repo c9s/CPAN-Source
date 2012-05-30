@@ -8,8 +8,7 @@ has class =>
     isa => 'Str';
 
 has version =>
-    is => 'rw',
-    isa => 'Str';
+    is => 'rw';
 
 has path =>
     is => 'rw',
