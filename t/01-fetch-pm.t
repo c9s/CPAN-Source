@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use lib 'lib';
 use CPAN::Source;
-use Test::More 'no_plan';
+use Test::More tests => 8;
 
 my $source = CPAN::Source->new( 
     mirror => 'http://cpan.nctu.edu.tw',
@@ -28,5 +28,3 @@ ok( $pkg );
 my $pm_content = $pkg->fetch_pm;
 ok( $pm_content );
 like( $pm_content , qr/=head1/s );
-
-done_testing;
