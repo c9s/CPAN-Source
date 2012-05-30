@@ -28,3 +28,5 @@ ok( $pkg );
 my $pm_content = $pkg->fetch_pm;
 ok( $pm_content );
 like( $pm_content , qr/=head1/s );
+
+done_testing;

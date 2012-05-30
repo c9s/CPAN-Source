@@ -1,5 +1,9 @@
 Revision history for Perl extension CPAN::Source
 
+0.03    三  5/30 14:35:41 2012
+        - Improve performance
+        - Drop out Moose, it's too slow
+
 0.02    Mon 9/19 00:24:18 2011
         - Add more accessors and tests
 
