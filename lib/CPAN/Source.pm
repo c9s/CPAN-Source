@@ -144,6 +144,9 @@ sub prepare_package_data {
 
     my $content = _decode_gzip( $self->fetch_package_data );
 
+
+    debug "Parsing package data...";
+
     my @lines = split /\n/,$content;
 
     # File:         02packages.details.txt
@@ -173,7 +176,6 @@ sub prepare_package_data {
           DateTime::Format::HTTP->parse_datetime( $meta->{'Last-Updated'} );
 
     my $packages = {  };
-
     my $cnt = 0;
     my $size = scalar @lines;
 
@@ -220,6 +222,8 @@ sub prepare_modlist {
     my $self = shift;
     debug "Prepare modlist data...";
     my $modlist_txt = _decode_gzip( $self->fetch_modlist_data );
+
+    debug "Parsing modlist data...";
     $self->modlist( $self->parse_modlist( $modlist_txt ) );
 }
 
