@@ -378,7 +378,8 @@ sub http_get {
         my $resp = $ua->get($url);
         $content = $resp->content;
     }
-    $self->cache->set( $url , $content , $cache_expiry ) if $self->cache;
+    $self->cache->set( (ref($url) ? $url->as_string : $url ) , $content , $cache_expiry ) 
+        if $self->cache;
     return $content;
 }
 
