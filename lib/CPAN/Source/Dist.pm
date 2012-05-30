@@ -19,27 +19,6 @@ use YAML::XS;
 use URI;
 use overload '""' => \&to_string;
 
-# use Mouse;
-# has name => is => 'rw', isa => 'Str';
-# 
-# has version_name => is => 'rw';
-# 
-# has version => is => 'rw', isa => 'Str';
-# 
-# has maturity => is => 'rw';
-# 
-# has filename => is => 'rw';
-# 
-# has cpanid => is => 'rw';
-# 
-# has extension => is => 'rw';
-# 
-# has pathname => is => 'rw';
-# 
-# has source_path => is => 'rw';
-# 
-# has _parent => is => 'rw', isa => 'CPAN::Source';
-
 # CPAN::DistnameInfo compatible
 sub dist { $_[0]->name; }
 
