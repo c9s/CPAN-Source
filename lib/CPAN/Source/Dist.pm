@@ -1,7 +1,7 @@
 package CPAN::Source::Dist;
 use warnings;
 use strict;
-use Any::Moose;
+use Mouse;
 use JSON::XS;
 use YAML::XS;
 use URI;

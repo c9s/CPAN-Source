@@ -4,7 +4,7 @@ use strict;
 use feature qw(say);
 use Try::Tiny;
 use URI;
-use Any::Moose;
+use Mouse;
 use Compress::Zlib;
 use LWP::UserAgent;
 use XML::Simple qw(XMLin);

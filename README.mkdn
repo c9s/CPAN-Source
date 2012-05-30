@@ -33,7 +33,7 @@ The distribution info is from [CPAN::DistnameInfo](http://search.cpan.org/perldo
     $source->dists;  # all dist information
     $source->authors;  # all author information
 
-    $source->package_data;  # parsed package data from 02packages.details.txt.gz
+    $source->packages;      # parsed package data from 02packages.details.txt.gz
     $source->modlist;       # parsed package data from 03modlist.data.gz
     $source->mailrc;        # parsed mailrc data  from 01mailrc.txt.gz
 

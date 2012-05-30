@@ -1,7 +1,7 @@
 package CPAN::Source::Package;
 use warnings;
 use strict;
-use Any::Moose;
+use Mouse;
 
 has class =>
     is => 'rw',
