@@ -247,6 +247,8 @@ sub fetch_package_data {
     my $cnt = 0;
     my $size = scalar @lines;
 
+    debug "Loading CPAN::DistnameInfo ...";
+
     local $|;
 
     for ( @lines ) {
@@ -258,6 +260,10 @@ sub fetch_package_data {
         my $tar_path = $self->mirror . '/authors/id/' . $path;
 
         my $dist;
+
+        debug "Processing $class from $tar_path...";
+
+        # Which fetchs cpan dist file and parse the meta-data.
         my $d = CPAN::DistnameInfo->new( $tar_path );
         if( $d->version ) {
             # register "Foo-Bar" to dists hash...
@@ -351,6 +357,7 @@ sub dist {
 sub http_get { 
     my ($self,$url,$cache_expiry) = @_;
 
+
     debug "Downloading $url ...";
 
     if( $self->cache ) {
@@ -358,12 +365,19 @@ sub http_get {
         return $c if $c;
     }
 
-
-    my $ua = $self->new_ua;
-    my $resp = $ua->get($url);
-
-    $self->cache->set( $url , $resp->content , $cache_expiry ) if $self->cache;
-    return $resp->content;
+    my $content;
+    if( -e $url ) {
+        local $/;
+        open FH , '<' , $url;
+        $content = <FH>;
+        close FH;
+    } else {
+        my $ua = $self->new_ua;
+        my $resp = $ua->get($url);
+        $content = $resp->content;
+    }
+    $self->cache->set( $url , $content , $cache_expiry ) if $self->cache;
+    return $content;
 }
 
 
