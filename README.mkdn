@@ -98,7 +98,7 @@ Which is a hashref, contains:
         },
         packages => { 
             'Foo::Bar' => {
-                class     => 'Foo::Bar',
+                package   => 'Foo::Bar',
                 version   =>  0.01 ,
                 path      =>  tar path,
                 dist      =>  dist name

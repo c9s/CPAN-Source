@@ -1,5 +1,9 @@
 Revision history for Perl extension CPAN::Source
 
+
+0.04    三  5/30 14:59:07 2012
+        - Rename class to package
+
 0.03    三  5/30 14:35:41 2012
         - Improve performance
         - Drop out Moose, it's too slow

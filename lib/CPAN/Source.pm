@@ -20,7 +20,7 @@ use CPAN::Source::Package;
 
 use constant { DEBUG => $ENV{DEBUG} };
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 # options ...
